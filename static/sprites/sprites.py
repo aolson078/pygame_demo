@@ -21,12 +21,11 @@ class Player(pygame.sprite.Sprite):
 		self.y_change = 0
 
 		self.facing = 'down'
-		image_to_load = pygame.image.load('static/assets/images/alien.png')
-		self.image = pygame.Surface([self.width, self.height])
-		self.image.set_colorkey(BLACK)
-		self.image.blit(image_to_load, (0, 0))
 
-		#self.image.fill(GREEN)
+		image_to_load = pygame.image.load('static/assets/images/alien.png')
+		self.image = image_to_load
+		self.image = pygame.transform.scale(image_to_load, (self.width, self.height))
+		self.image.set_colorkey(BLACK)
 
 		self.rect = self.image.get_rect()
 		self.rect.x = self.x
