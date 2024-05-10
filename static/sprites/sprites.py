@@ -1,5 +1,5 @@
 import pygame
-from pygame_demo.config import *
+from config import *
 import math
 import random
 
@@ -36,8 +36,7 @@ class Player(pygame.sprite.Sprite):
 		# self.image = pygame.transform.scale(image_to_load, (self.width, self.height))
 		# self.image.set_colorkey(BLACK)
 
-
-		self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
+		# self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
 
 		image_to_load = pygame.image.load('static/assets/img/single.png')
 		self.image = image_to_load
@@ -54,10 +53,14 @@ class Player(pygame.sprite.Sprite):
 		self.movement()
 
 		self.rect.x += self.x_change
+		self.collide_blocks("x")
 		self.rect.y += self.y_change
+		self.collide_blocks("y")
 
 		self.x_change = 0
 		self.y_change = 0
+
+
 
 	def movement(self):
 		# get list of every key pressed
@@ -74,6 +77,28 @@ class Player(pygame.sprite.Sprite):
 		if keys[pygame.K_DOWN]:
 			self.y_change += PLAYER_SPEED
 			self.facing = 'down'
+
+	def collide_blocks(self, direction):
+		print(self.game.blocks)
+		if direction == "x":
+			# checks if rect of one sprite hits rect of other
+			# params: sprite 1, sprite 2, delete on collision?
+			hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
+			if hits:
+
+				if self.x_change > 0:
+					self.rect.x = hits[0].rect.left - self.rect.width
+				if self.x_change < 0:
+					self.rect.x = hits[0].rect.right
+
+		if direction == "y":
+			hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
+			if hits:
+				if self.y_change > 0:
+					self.rect.y = hits[0].rect.top - self.rect.height
+				if self.y_change < 0:
+					self.rect.y = hits[0].rect.bottom
+
 
 
 class Block(pygame.sprite.Sprite):
