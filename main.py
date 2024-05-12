@@ -1,5 +1,4 @@
-import pygame
-from static.sprites.sprites import *
+from sprites import *
 from config import *
 import sys
 
@@ -12,16 +11,22 @@ class Game:
 
 		self.character_spritesheet = Spritesheet('static/assets/img/character.png')
 		self.terrain_spritesheet = Spritesheet('static/assets/img/terrain.png')
+		self.enemy_spritesheet = Spritesheet('static/assets/img/enemy.png')
 
 	def createTilemap(self):
 		for i, row in enumerate(tilemap):
 			for j, column in enumerate(row):
+				# Add ground tiles to tilemap
 				Ground(self, j, i)
+				# Add blocks/walls to tilemap
 				if column == "B":
 					self.blocks.add(Block(self, j, i))
-
+				# Add player to tilemap
 				if column == "P":
 					Player(self, j, i)
+				# Add enemy to tilemap
+				if column == "E":
+					Enemy(self, j, i)
 
 
 	def new(self):
