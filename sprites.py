@@ -94,19 +94,26 @@ class Player(pygame.sprite.Sprite):
 			# params: sprite 1, sprite 2, delete on collision?
 			hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
 			if hits:
-
 				if self.x_change > 0:
 					self.rect.x = hits[0].rect.left - self.rect.width
+					for sprite in self.game.all_sprites:
+						sprite.rect.x += PLAYER_SPEED
 				if self.x_change < 0:
 					self.rect.x = hits[0].rect.right
+					for sprite in self.game.all_sprites:
+						sprite.rect.x -= PLAYER_SPEED
 
 		if direction == "y":
 			hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
 			if hits:
 				if self.y_change > 0:
 					self.rect.y = hits[0].rect.top - self.rect.height
+					for sprite in self.game.all_sprites:
+						sprite.rect.y += PLAYER_SPEED
 				if self.y_change < 0:
 					self.rect.y = hits[0].rect.bottom
+					for sprite in self.game.all_sprites:
+						sprite.rect.y -= PLAYER_SPEED
 
 
 	def animate(self):
