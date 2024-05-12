@@ -12,9 +12,10 @@ class Game:
 		self.running = True
 		self.font = pygame.font.Font('arial.ttf', 32)
 
-		self.character_spritesheet = Spritesheet('static/assets/img/character.png')
-		self.terrain_spritesheet = Spritesheet('static/assets/img/terrain.png')
-		self.enemy_spritesheet = Spritesheet('static/assets/img/enemy.png')
+		self.character_spritesheet = Spritesheet("static/assets/img/character.png")
+		self.terrain_spritesheet = Spritesheet("static/assets/img/terrain.png")
+		self.enemy_spritesheet = Spritesheet("static/assets/img/enemy.png")
+		self.attack_spritesheet = Spritesheet("static/assets/img/attack.png")
 		self.intro_background = pygame.image.load("static/assets/img/introbackground.png")
 		self.go_background = pygame.image.load("static/assets/img/gameover.png")
 
@@ -29,11 +30,10 @@ class Game:
 					self.blocks.add(Block(self, j, i))
 				# Add player to tilemap
 				if column == "P":
-					Player(self, j, i)
+					self.player = Player(self, j, i)
 				# Add enemy to tilemap
 				if column == "E":
 					Enemy(self, j, i)
-
 
 	def new(self):
 		# new game starts
@@ -46,13 +46,24 @@ class Game:
 
 		self.createTilemap()
 
-
 	def events(self):
 		# game loop events
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				self.playing = False
 				self.running = False
+
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_SPACE:
+
+					if self.player.facing == 'up':
+						Attack(self, self.player.rect.x, self.player.rect.y - TILESIZE)
+					if self.player.facing == 'down':
+						Attack(self, self.player.rect.x, self.player.rect.y + TILESIZE)
+					if self.player.facing == 'left':
+						Attack(self, self.player.rect.x  - TILESIZE, self.player.rect.y)
+					if self.player.facing == 'right':
+						Attack(self, self.player.rect.x  + TILESIZE, self.player.rect.y)
 
 	def update(self):
 		# game loop updates
