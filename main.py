@@ -55,7 +55,6 @@ class Game:
 
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_SPACE:
-
 					if self.player.facing == 'up':
 						Attack(self, self.player.rect.x, self.player.rect.y - TILESIZE)
 					if self.player.facing == 'down':
@@ -64,6 +63,9 @@ class Game:
 						Attack(self, self.player.rect.x  - TILESIZE, self.player.rect.y)
 					if self.player.facing == 'right':
 						Attack(self, self.player.rect.x  + TILESIZE, self.player.rect.y)
+
+			elif event.type == pygame.USEREVENT:
+				self.player.turn_off_invincibility()
 
 	def update(self):
 		# game loop updates

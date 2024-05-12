@@ -21,6 +21,12 @@ class Player(pygame.sprite.Sprite):
 		self.groups = self.game.all_sprites
 		pygame.sprite.Sprite.__init__(self, self.groups)
 
+#----PLAYER ATTRIBUTES--------------------------------------------------------------------------------------------------
+		self.health = 5
+		self.invincible = False
+# ----------------------------------------------------------------------------------------------------------------------
+
+
 		self.x = x * TILESIZE
 		self.y = y * TILESIZE
 		self.width = TILESIZE
@@ -38,7 +44,6 @@ class Player(pygame.sprite.Sprite):
 		self.image.blit(image_to_load, (0,0))
 		self.image = pygame.transform.scale(image_to_load, (self.width, self.height))
 
-
 		self.rect = self.image.get_rect()
 		self.rect.x = self.x
 		self.rect.y = self.y
@@ -46,15 +51,12 @@ class Player(pygame.sprite.Sprite):
 		self.down_animations = [self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height),
 		                   self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
 		                   self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height)]
-
 		self.up_animations = [self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height),
 		                 self.game.character_spritesheet.get_sprite(35, 34, self.width, self.height),
 		                 self.game.character_spritesheet.get_sprite(68, 34, self.width, self.height)]
-
 		self.left_animations = [self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height),
 		                   self.game.character_spritesheet.get_sprite(35, 98, self.width, self.height),
 		                   self.game.character_spritesheet.get_sprite(68, 98, self.width, self.height)]
-
 		self.right_animations = [self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height),
 		                    self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
 		                    self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)]
@@ -98,11 +100,27 @@ class Player(pygame.sprite.Sprite):
 			self.y_change += PLAYER_SPEED
 			self.facing = 'down'
 
+
+
 	def collide_enemy(self):
 		hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
 		if hits:
-			self.kill()
-			self.game.playing = False
+			if not self.invincible:
+				if self.health > 1:
+					self.health -= 1
+					self.invincible = True
+					user_hit = pygame.USEREVENT
+					pygame.time.set_timer(user_hit, 1000)
+				else:
+					self.kill()
+					self.game.playing = False
+			else:
+				pass
+
+
+	def turn_off_invincibility(self):
+		self.invincible = False
+
 
 	def collide_blocks(self, direction):
 		if direction == "x":
@@ -133,8 +151,6 @@ class Player(pygame.sprite.Sprite):
 
 
 	def animate(self):
-
-
 		# if were standing still, set image to static. If y change isnt 0, we are moving, and using down_animations
 		if self.facing == "down":
 			if self.y_change == 0:
@@ -237,8 +253,6 @@ class Enemy(pygame.sprite.Sprite):
 				self.facing = "left"
 
 	def animate(self):
-
-
 		# if were standing still, set image to static. If y change isnt 0, we are moving, and using down_animations
 		if self.facing == "down":
 			if self.y_change == 0:
