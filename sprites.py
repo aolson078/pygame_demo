@@ -59,7 +59,7 @@ class Player(pygame.sprite.Sprite):
 
 
 	def movement(self):
-		# get list of every key pressed
+		# get list for every key pressed
 		keys = pygame.key.get_pressed()
 		if keys[pygame.K_LEFT]:
 			# for sprite in self.game.all_sprites:
