@@ -23,6 +23,8 @@ class Player(pygame.sprite.Sprite):
 
 #----PLAYER ATTRIBUTES--------------------------------------------------------------------------------------------------
 		self.health = 5
+		self.exp = 0
+		self.level = 1
 		self.invincible = False
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -62,6 +64,10 @@ class Player(pygame.sprite.Sprite):
 		                    self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)]
 
 	def update(self):
+		if self.exp == 5:
+			self.level += 1
+			self.exp = 0
+			print(self.level)
 		self.movement()
 		self.animate()
 		self.collide_enemy()
@@ -405,7 +411,9 @@ class Attack(pygame.sprite.Sprite):
 		self.collide()
 
 	def collide(self):
-		hits = pygame.sprite.spritecollide(self, self.game.enemies, True)
+		if pygame.sprite.spritecollide(self, self.game.enemies, True):
+			self.game.player.exp += 1
+
 
 	def animate(self):
 		direction = self.game.player.facing
