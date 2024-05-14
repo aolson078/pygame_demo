@@ -67,7 +67,6 @@ class Player(pygame.sprite.Sprite):
 		if self.exp == 5:
 			self.level += 1
 			self.exp = 0
-			print(self.level)
 		self.movement()
 		self.animate()
 		self.collide_enemy()
@@ -86,23 +85,15 @@ class Player(pygame.sprite.Sprite):
 		# get list for every key pressed
 		keys = pygame.key.get_pressed()
 		if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-			for sprite in self.game.all_sprites:
-				sprite.rect.x += PLAYER_SPEED
 			self.x_change -= PLAYER_SPEED
 			self.facing = 'left'
 		if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-			for sprite in self.game.all_sprites:
-				sprite.rect.x -= PLAYER_SPEED
 			self.x_change += PLAYER_SPEED
 			self.facing = 'right'
 		if keys[pygame.K_UP] or keys[pygame.K_w]:
-			for sprite in self.game.all_sprites:
-				sprite.rect.y += PLAYER_SPEED
 			self.y_change -= PLAYER_SPEED
 			self.facing = 'up'
 		if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-			for sprite in self.game.all_sprites:
-				sprite.rect.y -= PLAYER_SPEED
 			self.y_change += PLAYER_SPEED
 			self.facing = 'down'
 
@@ -136,24 +127,24 @@ class Player(pygame.sprite.Sprite):
 			if hits:
 				if self.x_change > 0:
 					self.rect.x = hits[0].rect.left - self.rect.width
-					for sprite in self.game.all_sprites:
-						sprite.rect.x += PLAYER_SPEED
+					# for sprite in self.game.all_sprites:
+					# 	sprite.rect.x += PLAYER_SPEED
 				if self.x_change < 0:
 					self.rect.x = hits[0].rect.right
-					for sprite in self.game.all_sprites:
-						sprite.rect.x -= PLAYER_SPEED
+					# for sprite in self.game.all_sprites:
+					# 	sprite.rect.x -= PLAYER_SPEED
 
 		if direction == "y":
 			hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
 			if hits:
 				if self.y_change > 0:
 					self.rect.y = hits[0].rect.top - self.rect.height
-					for sprite in self.game.all_sprites:
-						sprite.rect.y += PLAYER_SPEED
+					# for sprite in self.game.all_sprites:
+					# 	sprite.rect.y += PLAYER_SPEED
 				if self.y_change < 0:
 					self.rect.y = hits[0].rect.bottom
-					for sprite in self.game.all_sprites:
-						sprite.rect.y -= PLAYER_SPEED
+					# for sprite in self.game.all_sprites:
+					# 	sprite.rect.y -= PLAYER_SPEED
 
 
 	def animate(self):
@@ -315,7 +306,6 @@ class Block(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.x = self.x
 		self.rect.y = self.y
-
 
 class Ground(pygame.sprite.Sprite):
 	def __init__(self, game, x, y):

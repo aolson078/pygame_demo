@@ -4,13 +4,17 @@ from sprites import *
 from config import *
 import sys
 
+
 class Game:
 	def __init__(self):
 		pygame.init()
+
+
 		self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 		self.clock = pygame.time.Clock()
 		self.running = True
 		self.font = pygame.font.Font('arial.ttf', 32)
+		self.camera = Camera(WORLD_WIDTH, WORLD_HEIGHT)
 
 		self.character_spritesheet = Spritesheet("static/assets/img/character.png")
 		self.terrain_spritesheet = Spritesheet("static/assets/img/terrain.png")
@@ -24,16 +28,16 @@ class Game:
 		for i, row in enumerate(tilemap):
 			for j, column in enumerate(row):
 				# Add ground tiles to tilemap
-				Ground(self, j, i)
+				Ground(self, j + 50, i + 50)
 				# Add blocks/walls to tilemap
 				if column == "B":
-					self.blocks.add(Block(self, j, i))
+					self.blocks.add(Block(self, j + 50, i + 50))
 				# Add player to tilemap
 				if column == "P":
-					self.player = Player(self, j, i)
+					self.player = Player(self, j + 50, i + 50)
 				# Add enemy to tilemap
 				if column == "E":
-					Enemy(self, j, i)
+					Enemy(self, j + 50, i + 50)
 
 	def new(self):
 		# new game starts
@@ -70,12 +74,27 @@ class Game:
 	def update(self):
 		# game loop updates
 		self.all_sprites.update()
+		#self.player.update()
+		self.camera.update(self.player)
 
 	def draw(self):
 		self.screen.fill(BLACK)
-		self.all_sprites.draw(self.screen)
+		for sprite in self.all_sprites:
+			self.screen.blit(sprite.image, self.camera.apply(sprite))
+		self.display_stats()
 		self.clock.tick(FPS)
 		pygame.display.update()
+
+	def display_stats(self):
+		# create surface for stat bar
+		stats_surface = pygame.Surface((WIN_WIDTH, 50))
+		stats_surface.fill((0,0,0))
+
+		# render text
+		text = self.font.render(f"Lvl: {self.player.level}  Exp: {self.player.exp}  HP: {self.player.health}", True, WHITE)
+		text_rect = text.get_rect(center=(WIN_WIDTH // 2, 25)) # centered horizontally, 25 px from top
+		stats_surface.blit(text, text_rect)
+		self.screen.blit(stats_surface, (0,0))
 
 	def main(self):
 		# game loop
@@ -138,6 +157,28 @@ class Game:
 			self.clock.tick(FPS)
 			pygame.display.update()
 
+
+class Camera:
+	def __init__(self, width, height):
+		self.camera = pygame.Rect(0, 0, width, height)
+		self.width = width
+		self.height = height
+
+	def apply(self, entity):
+		return entity.rect.move(self.camera.topleft)
+
+	def update(self, target):
+		x = -target.rect.centerx + int(WIN_WIDTH / 2)
+		y = -target.rect.centery + int(WIN_HEIGHT / 2)
+
+		# limit scrolling to map size
+		x = min(0, x)  # left
+		y = min(0, y)  # top
+		x = max(-(self.width - WIN_WIDTH), x)  # right
+		y = max(-(self.height - WIN_HEIGHT), y)  # bottom
+
+
+		self.camera = pygame.Rect(x, y, self.width, self.height)
 
 g = Game()
 g.intro_screen()
