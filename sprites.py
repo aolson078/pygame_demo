@@ -26,6 +26,7 @@ class Player(pygame.sprite.Sprite):
 		self.exp = 0
 		self.level = 1
 		self.invincible = False
+		self.money = 0
 # ----------------------------------------------------------------------------------------------------------------------
 
 

@@ -9,7 +9,6 @@ class Game:
 	def __init__(self):
 		pygame.init()
 
-
 		self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 		self.clock = pygame.time.Clock()
 		self.running = True
@@ -91,7 +90,7 @@ class Game:
 		stats_surface.fill((0,0,0))
 
 		# render text
-		text = self.font.render(f"Lvl: {self.player.level}  Exp: {self.player.exp}  HP: {self.player.health}", True, WHITE)
+		text = self.font.render(f"Lvl {self.player.level}  Exp {self.player.exp}  HP {self.player.health} ${self.player.money}", True, WHITE)
 		text_rect = text.get_rect(center=(WIN_WIDTH // 2, 25)) # centered horizontally, 25 px from top
 		stats_surface.blit(text, text_rect)
 		self.screen.blit(stats_surface, (0,0))
@@ -102,7 +101,6 @@ class Game:
 			self.events()
 			self.update()
 			self.draw()
-
 
 	def game_over(self):
 		text = self.font.render("Game Over!", True, WHITE)
