@@ -404,6 +404,7 @@ class Attack(pygame.sprite.Sprite):
 	def collide(self):
 		if pygame.sprite.spritecollide(self, self.game.enemies, True):
 			self.game.player.exp += 1
+			self.game.player.money += 1
 
 
 	def animate(self):
