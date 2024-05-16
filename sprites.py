@@ -227,12 +227,31 @@ class Enemy(pygame.sprite.Sprite):
                             self.game.enemy_spritesheet.get_sprite(35, 66, self.width, self.height),
                             self.game.enemy_spritesheet.get_sprite(68, 66, self.width, self.height)]
 
+    def collide_blocks(self, direction):
+        if direction == "x":
+            # checks if rect of one sprite hits rect of other
+            # params: sprite 1, sprite 2, delete on collision?
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
+            if hits:
+                if self.x_change > 0:
+                    self.rect.x = hits[0].rect.left - self.rect.width
+                    # for sprite in self.game.all_sprites:
+                    # 	sprite.rect.x += PLAYER_SPEED
+                if self.x_change < 0:
+                    self.rect.x = hits[0].rect.right
+                    # for sprite in self.game.all_sprites:
+                    # 	sprite.rect.x -= PLAYER_SPEED
+
     def update(self):
         self.movement()
         self.animate()
 
         self.rect.x += self.x_change
+        self.collide_blocks("x")
         self.rect.y += self.y_change
+        self.collide_blocks("y")
+
+
 
         self.x_change = 0
         self.y_change = 0

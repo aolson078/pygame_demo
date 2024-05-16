@@ -58,7 +58,6 @@ class Game:
 				tilemap[y][x] = 'P'
 				break
 
-		print(tilemap)
 		return tilemap
 
 	def createTilemap(self):
