@@ -7,6 +7,9 @@ NUM_EXTRA_BLOCKS = 10
 MAP_HEIGHT = 15
 MAP_WIDTH = 20
 
+# PLayer = 0 Enemy = 1
+PLAYER_OR_ENEMY = 0
+
 
 # tilemap = [
 # 	'BBBBBBBBBBBBBBBBBBBB',

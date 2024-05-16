@@ -23,6 +23,7 @@ class Game:
 		self.intro_background = pygame.image.load("static/assets/img/introbackground.png")
 		self.go_background = pygame.image.load("static/assets/img/gameover.png")
 		self.tilemap = self.generate_tilemap(MAP_HEIGHT, MAP_WIDTH)
+		self.enemy_timers = {}
 
 
 	def generate_tilemap(self, height, width):
@@ -91,8 +92,6 @@ class Game:
 
 		self.createTilemap()
 
-
-
 	def events(self):
 		# game loop events
 		for event in pygame.event.get():
@@ -107,12 +106,12 @@ class Game:
 					if self.player.facing == 'down':
 						Attack(self, self.player.rect.x, self.player.rect.y + TILESIZE)
 					if self.player.facing == 'left':
-						Attack(self, self.player.rect.x  - TILESIZE, self.player.rect.y)
+						Attack(self, self.player.rect.x - TILESIZE, self.player.rect.y)
 					if self.player.facing == 'right':
-						Attack(self, self.player.rect.x  + TILESIZE, self.player.rect.y)
+						Attack(self, self.player.rect.x + TILESIZE, self.player.rect.y)
 
-			elif event.type == pygame.USEREVENT:
-				self.player.turn_off_invincibility()
+			elif event.type >= pygame.USEREVENT and event.type in self.enemy_timers:
+				self.enemy_timers[event.type].turn_off_invincibility()  # turn off invincibility of specific enemy
 
 	def update(self):
 		# game loop updates

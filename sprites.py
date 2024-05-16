@@ -1,7 +1,9 @@
 import pygame
 from config import *
+import config
 import math
 import random
+
 
 class Spritesheet:
     def __init__(self, file):
@@ -101,6 +103,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def collide_enemy(self):
+        config.PLAYER_OR_ENEMY = 0
         hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if hits:
             if not self.invincible:
@@ -187,11 +190,20 @@ class Player(pygame.sprite.Sprite):
                     self.animation_loop = 1
 
 class Enemy(pygame.sprite.Sprite):
+
+    id_counter = 0
+
     def __init__(self, game, x, y):
         self.game = game
         self._layer = ENEMY_LAYER
         self.groups = self.game.all_sprites, self.game.enemies
         pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.health = 2
+        self.invincible = False
+        self.id = Enemy.id_counter
+        Enemy.id_counter += 1
+
 
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -226,6 +238,9 @@ class Enemy(pygame.sprite.Sprite):
         self.right_animations = [self.game.enemy_spritesheet.get_sprite(3, 66, self.width, self.height),
                             self.game.enemy_spritesheet.get_sprite(35, 66, self.width, self.height),
                             self.game.enemy_spritesheet.get_sprite(68, 66, self.width, self.height)]
+
+    def turn_off_invincibility(self):
+        self.invincible = False
 
     def collide_blocks(self, direction):
         if direction == "x":
@@ -316,8 +331,6 @@ class Enemy(pygame.sprite.Sprite):
         new_row[y] = 'E'
 
         self.game.tilemap[x] = "".join(new_row)
-
-
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -433,10 +446,20 @@ class Attack(pygame.sprite.Sprite):
         self.collide()
 
     def collide(self):
-        if pygame.sprite.spritecollide(self, self.game.enemies, True):
-            self.game.player.exp += 1
-            self.game.player.money += 1
-
+        config.PLAYER_OR_ENEMY = 1
+        hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
+        for hit in hits:
+            if not hit.invincible:
+                if hit.health > 1:
+                    hit.health -= 1
+                    hit.invincible = True
+                    enemy_hit = pygame.USEREVENT + hit.id  # use unique id of enemy
+                    self.game.enemy_timers[enemy_hit] = hit  # map event to enemy
+                    pygame.time.set_timer(enemy_hit, 500)
+                else:
+                    hit.kill()
+                    self.game.player.exp += 1
+                    self.game.player.money += 1
 
     def animate(self):
         direction = self.game.player.facing
