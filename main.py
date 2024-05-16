@@ -47,7 +47,14 @@ class Game:
 		self.enemies = pygame.sprite.LayeredUpdates()
 		self.attacks = pygame.sprite.LayeredUpdates()
 
+		x = random.choice(range(len(tilemap) - 1))
+		y = random.choice(range(len(tilemap) - 1))
+		for _ in range(NUM_INITIAL_ENEMIES):
+			Enemy(self, x, y).spawn(x, y)
+
 		self.createTilemap()
+
+
 
 	def events(self):
 		# game loop events
