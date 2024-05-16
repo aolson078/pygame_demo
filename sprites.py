@@ -289,14 +289,14 @@ class Enemy(pygame.sprite.Sprite):
                     self.animation_loop = 1
 
     def spawn(self, x, y):
-        while tilemap[x][y] != '.':
-            x = random.choice(range(len(tilemap) - 1))
-            y = random.choice(range(len(tilemap) - 1))
+        while self.game.tilemap[x][y] != '.':
+            x = random.choice(range(len(self.game.tilemap) - 1))
+            y = random.choice(range(len(self.game.tilemap) - 1))
 
-        new_row = list(tilemap[x])
+        new_row = list(self.game.tilemap[x])
         new_row[y] = 'E'
 
-        tilemap[x] = "".join(new_row)
+        self.game.tilemap[x] = "".join(new_row)
 
 
 

@@ -7,6 +7,7 @@ import sys
 
 class Game:
 	def __init__(self):
+		self.player = None
 		pygame.init()
 
 		self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -21,10 +22,47 @@ class Game:
 		self.attack_spritesheet = Spritesheet("static/assets/img/attack.png")
 		self.intro_background = pygame.image.load("static/assets/img/introbackground.png")
 		self.go_background = pygame.image.load("static/assets/img/gameover.png")
+		self.tilemap = self.generate_tilemap(MAP_HEIGHT, MAP_WIDTH)
 
+
+	def generate_tilemap(self, height, width):
+		# init empty map
+		tilemap = [['.' for _ in range(width)] for _ in range(height)]
+
+		for i in range(width):
+			tilemap[0][i] = 'B'
+			tilemap[height - 1][i] = 'B'
+		for i in range(height):
+			tilemap[i][0] = 'B'
+			tilemap[i][width - 1] = 'B'
+		# scatter 'B's in the middle (while maintaining a path)
+		for _ in range(NUM_EXTRA_BLOCKS):
+			while True:
+				x, y = random.randint(1, width - 2), random.randint(1, height - 2)
+				if tilemap[y][x] == '.':
+					tilemap[y][x] = 'B'
+					break
+
+		# add 'E's to match the total number of enemies
+		num_remaining_enemies = NUM_INITIAL_ENEMIES
+		while num_remaining_enemies > 0:
+			x, y = random.randint(1, width - 2), random.randint(1, height - 2)
+			if tilemap[y][x] == '.':
+				tilemap[y][x] = 'E'
+				num_remaining_enemies -= 1
+
+		# Place 'P' for the player
+		while True:
+			x, y = random.randint(1, width - 2), random.randint(1, height - 2)
+			if tilemap[y][x] == '.':
+				tilemap[y][x] = 'P'
+				break
+
+		print(tilemap)
+		return tilemap
 
 	def createTilemap(self):
-		for i, row in enumerate(tilemap):
+		for i, row in enumerate(self.tilemap):
 			for j, column in enumerate(row):
 				# Add ground tiles to tilemap
 				Ground(self, j + 50, i + 50)
@@ -47,8 +85,8 @@ class Game:
 		self.enemies = pygame.sprite.LayeredUpdates()
 		self.attacks = pygame.sprite.LayeredUpdates()
 
-		x = random.choice(range(len(tilemap) - 1))
-		y = random.choice(range(len(tilemap) - 1))
+		x = random.choice(range(len(self.tilemap) - 1))
+		y = random.choice(range(len(self.tilemap) - 1))
 		for _ in range(NUM_INITIAL_ENEMIES):
 			Enemy(self, x, y).spawn(x, y)
 
@@ -80,7 +118,7 @@ class Game:
 	def update(self):
 		# game loop updates
 		self.all_sprites.update()
-		#self.player.update()
+		self.player.update()
 		self.camera.update(self.player)
 
 	def draw(self):

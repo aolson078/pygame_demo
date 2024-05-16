@@ -3,28 +3,31 @@ WIN_HEIGHT = 600
 TILESIZE = 32
 FPS = 60
 NUM_INITIAL_ENEMIES = 5
+NUM_EXTRA_BLOCKS = 10
+MAP_HEIGHT = 15
+MAP_WIDTH = 20
 
 
-tilemap = [
-	'BBBBBBBBBBBBBBBBBBBB',
-    'B..................B',
-	'B..................B',
-	'B....BBB...........B',
-    'B........P.........B',
-    'B..................B',
-	'B..................B',
-	'B.....BBB..........B',
-    'B.......B..........B',
-    'B.......B..........B',
-	'B..................B',
-	'B..................B',
-    'B..................B',
-	'B..................B',
-	'BBBBBBBBBBBBBBBBBBBB',
-]
+# tilemap = [
+# 	'BBBBBBBBBBBBBBBBBBBB',
+#     'B..................B',
+# 	'B..................B',
+# 	'B....BBB...........B',
+#     'B........P.........B',
+#     'B..................B',
+# 	'B..................B',
+# 	'B.....BBB..........B',
+#     'B.......B..........B',
+#     'B.......B..........B',
+# 	'B..................B',
+# 	'B..................B',
+#     'B..................B',
+# 	'B..................B',
+# 	'BBBBBBBBBBBBBBBBBBBB',
+# ]
 
-WORLD_WIDTH = len(tilemap[0]) * TILESIZE * 10
-WORLD_HEIGHT = len(tilemap) * TILESIZE * 10
+WORLD_WIDTH = MAP_WIDTH * TILESIZE * 10
+WORLD_HEIGHT = MAP_HEIGHT * TILESIZE * 10
 
 PLAYER_LAYER = 4
 ENEMY_LAYER = 3
