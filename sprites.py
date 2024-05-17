@@ -17,20 +17,24 @@ class Spritesheet:
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
-
         self.game = game
         self._layer = PLAYER_LAYER
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
 
-#----PLAYER ATTRIBUTES--------------------------------------------------------------------------------------------------
+        self.initialize_attributes(x, y)
+        self.load_sprites()
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def initialize_attributes(self, x, y):
         self.health = 5
         self.exp = 0
         self.level = 1
         self.invincible = False
         self.money = 0
-# ----------------------------------------------------------------------------------------------------------------------
-
 
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -43,49 +47,45 @@ class Player(pygame.sprite.Sprite):
         self.facing = 'down'
         self.animation_loop = 1
 
+    def load_sprites(self):
         image_to_load = pygame.image.load('static/assets/img/single.png')
         self.image = image_to_load
         self.image.set_colorkey(BLACK)
-        self.image.blit(image_to_load, (0,0))
         self.image = pygame.transform.scale(image_to_load, (self.width, self.height))
 
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
-
         self.down_animations = [self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height),
-                           self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
-                           self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height)]
+                                self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
+                                self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height)]
         self.up_animations = [self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height),
-                         self.game.character_spritesheet.get_sprite(35, 34, self.width, self.height),
-                         self.game.character_spritesheet.get_sprite(68, 34, self.width, self.height)]
+                              self.game.character_spritesheet.get_sprite(35, 34, self.width, self.height),
+                              self.game.character_spritesheet.get_sprite(68, 34, self.width, self.height)]
         self.left_animations = [self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height),
-                           self.game.character_spritesheet.get_sprite(35, 98, self.width, self.height),
-                           self.game.character_spritesheet.get_sprite(68, 98, self.width, self.height)]
+                                self.game.character_spritesheet.get_sprite(35, 98, self.width, self.height),
+                                self.game.character_spritesheet.get_sprite(68, 98, self.width, self.height)]
         self.right_animations = [self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height),
-                            self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
-                            self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)]
+                                 self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
+                                 self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)]
 
     def update(self):
-        if self.exp == 5:
-            self.level += 1
-            self.exp = 0
-        self.movement()
-        self.animate()
-        self.collide_enemy()
+        self.level_up()
+        self.handle_movement()
+        self.handle_animation()
+        self.collide_with_enemies()
 
         self.rect.x += self.x_change
-        self.collide_blocks("x")
+        self.collide_with_blocks("x")
         self.rect.y += self.y_change
-        self.collide_blocks("y")
+        self.collide_with_blocks("y")
 
         self.x_change = 0
         self.y_change = 0
 
+    def level_up(self):
+        if self.exp >= 5:
+            self.level += 1
+            self.exp = 0
 
-
-    def movement(self):
-        # get list for every key pressed
+    def handle_movement(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.x_change -= PLAYER_SPEED
@@ -100,94 +100,59 @@ class Player(pygame.sprite.Sprite):
             self.y_change += PLAYER_SPEED
             self.facing = 'down'
 
+        # normalize diagonal speed
+        if self.x_change != 0 and self.y_change != 0:  # if moving on both x and y-axis
+            self.x_change *= 0.7071   # reduce x speed by 1/sqrt(2)
+            self.y_change *= 0.7071   # reduce y speed by 1/sqrt(2)
 
-
-    def collide_enemy(self):
-        config.PLAYER_OR_ENEMY = 0
+    def collide_with_enemies(self):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
-        if hits:
-            if not self.invincible:
-                if self.health > 1:
-                    self.health -= 1
-                    self.invincible = True
-                    user_hit = pygame.USEREVENT
-                    pygame.time.set_timer(user_hit, 1000)
-                else:
-                    self.kill()
-                    self.game.playing = False
+        if hits and not self.invincible:
+            if self.health > 1:
+                self.health -= 1
+                self.invincible = True
+                pygame.time.set_timer(pygame.USEREVENT, 1000)
             else:
-                pass
-
+                self.kill()
+                self.game.playing = False
 
     def turn_off_invincibility(self):
         self.invincible = False
 
-
-    def collide_blocks(self, direction):
+    def collide_with_blocks(self, direction):
         if direction == "x":
-            # checks if rect of one sprite hits rect of other
-            # params: sprite 1, sprite 2, delete on collision?
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
             if hits:
                 if self.x_change > 0:
                     self.rect.x = hits[0].rect.left - self.rect.width
-                    # for sprite in self.game.all_sprites:
-                    # 	sprite.rect.x += PLAYER_SPEED
                 if self.x_change < 0:
                     self.rect.x = hits[0].rect.right
-                    # for sprite in self.game.all_sprites:
-                    # 	sprite.rect.x -= PLAYER_SPEED
 
         if direction == "y":
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
             if hits:
                 if self.y_change > 0:
                     self.rect.y = hits[0].rect.top - self.rect.height
-                    # for sprite in self.game.all_sprites:
-                    # 	sprite.rect.y += PLAYER_SPEED
                 if self.y_change < 0:
                     self.rect.y = hits[0].rect.bottom
-                    # for sprite in self.game.all_sprites:
-                    # 	sprite.rect.y -= PLAYER_SPEED
 
+    def handle_animation(self):
+        animations = {
+            'down': self.down_animations,
+            'up': self.up_animations,
+            'left': self.left_animations,
+            'right': self.right_animations
+        }
 
-    def animate(self):
-        # if were standing still, set image to static. If y change isnt 0, we are moving, and using down_animations
-        if self.facing == "down":
-            if self.y_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
+        if self.facing in animations:
+            if (self.facing in ['left', 'right'] and self.x_change == 0) or (
+                    self.facing in ['up', 'down'] and self.y_change == 0):
+                self.image = animations[self.facing][0]
             else:
-                self.image = self.down_animations[math.floor(self.animation_loop)]
+                self.image = animations[self.facing][math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
-                if self.animation_loop >= 3:
-                    self.animation_loop = 1
-
-        if self.facing == "up":
-            if self.y_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height)
-            else:
-                self.image = self.up_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
-                if self.animation_loop >= 3:
-                    self.animation_loop = 1
-
-        if self.facing == "left":
-            if self.x_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height)
-            else:
-                self.image = self.left_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
-                if self.animation_loop >= 3:
-                    self.animation_loop = 1
-
-        if self.facing == "right":
-            if self.x_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height)
-            else:
-                self.image = self.right_animations[math.floor(self.animation_loop)]
-                self.animation_loop += 0.1
-                if self.animation_loop >= 3:
-                    self.animation_loop = 1
+                if self.animation_loop >= len(animations[self.facing]):
+                    self.animation_loop = 0
 
 class Enemy(pygame.sprite.Sprite):
 
